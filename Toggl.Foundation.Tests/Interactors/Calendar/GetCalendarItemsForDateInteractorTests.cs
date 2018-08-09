@@ -105,6 +105,34 @@ namespace Toggl.Foundation.Tests.Interactors.Calendar
 
                 calendarItems.Should().BeInAscendingOrder(calendarItem => calendarItem.StartTime);
             }
+
+            [Fact, LogIfTooSlow]
+            public async Task FiltersElementsLongerThanTwentyFourHours()
+            {
+                var newCalendarEvents = calendarEvents
+                    .Append(
+                        new CalendarItem(CalendarItemSource.Calendar,
+                            new DateTimeOffset(2018, 08, 06, 10, 30, 00, TimeSpan.Zero),
+                            TimeSpan.FromHours(24),
+                            "Day off",
+                            "#0000ff"))
+                    .Append(
+                        new CalendarItem(CalendarItemSource.Calendar,
+                            new DateTimeOffset(2018, 08, 06, 10, 30, 00, TimeSpan.Zero),
+                            TimeSpan.FromDays(7),
+                            "Team meetup",
+                            "#0000ff")
+                    );
+
+                CalendarService
+                    .GetEventsForDate(Arg.Is(date))
+                    .Returns(Observable.Return(newCalendarEvents));
+                
+                var calendarItems = await interactor.Execute();
+
+                calendarItems.Should().HaveCount(newCalendarEvents.Count() - 2);
+                calendarItems.Should().NotContain(calendarItem => calendarItem.Description == "Day off" || calendarItem.Description == "Team meetup");
+            }
         }
     }
 }
