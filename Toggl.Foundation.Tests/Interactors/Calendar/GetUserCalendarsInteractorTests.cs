@@ -41,24 +41,24 @@ namespace Toggl.Foundation.Tests.Interactors.Calendar
 
             private static readonly IEnumerable<string> selectedCalendars = new List<string> { "foo", "bar" };
 
-            [Fact]
-            public async Task ReturnsAllCalendarsFromTheCalendarService()
+            public TheExecuteMethod()
             {
                 var observable = Observable.Return(calendarsFromService);
                 CalendarService.GetUserCalendars().Returns(observable);
+                UserPreferences.EnabledCalendarIds().Returns(selectedCalendars);
+            }
 
+            [Fact]
+            public async Task ReturnsAllCalendarsFromTheCalendarService()
+            {
                 var calendars = await InteractorFactory.GetUserCalendars().Execute();
+
                 calendars.Should().HaveCount(calendarsFromService.Count());
             }
 
             [Fact]
             public async Task SetsTheCalendarsToSelectedWhenTheyWereSelectedByTheUser()
             {
-
-                var observable = Observable.Return(calendarsFromService);
-                CalendarService.GetUserCalendars().Returns(observable);
-                UserPreferences.EnabledCalendarIds().Returns(selectedCalendars);
-
                 var calendars = await InteractorFactory.GetUserCalendars().Execute();
 
                 calendars.Where(c => c.IsSelected).Should().HaveCount(selectedCalendars.Count());

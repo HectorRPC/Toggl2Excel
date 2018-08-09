@@ -130,7 +130,7 @@ namespace Toggl.Foundation.Tests.Interactors.Calendar
                 
                 var calendarItems = await interactor.Execute();
 
-                calendarItems.Should().HaveCount(newCalendarEvents.Count() - 2);
+                calendarItems.Should().HaveCount(calendarItemsFromTimeEntries.Count + newCalendarEvents.Count() - 2);
                 calendarItems.Should().NotContain(calendarItem => calendarItem.Description == "Day off" || calendarItem.Description == "Team meetup");
             }
         }
