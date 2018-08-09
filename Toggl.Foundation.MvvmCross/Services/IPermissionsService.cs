@@ -4,7 +4,7 @@ namespace Toggl.Foundation.MvvmCross.Services
 {
     public interface IPermissionsService
     {
-        bool CalendarAuthorizationStatus { get; }
+        bool CalendarPermissionGranted { get; }
 
         IObservable<bool> RequestCalendarAuthorization(bool force = false);
 

@@ -32,9 +32,9 @@ namespace Toggl.Daneel.Services
             => Observable.Return(new List<CalendarItem>());
 
         public IObservable<IEnumerable<UserCalendar>> UserCalendars
-            => Observable.DeferAsync(async (cancellactionToken) =>
+            => Observable.Defer(() =>
                 {
-                    var isAuthorized = permissionsService.CalendarAuthorizationStatus;
+                    var isAuthorized = permissionsService.CalendarPermissionGranted;
                     if (!isAuthorized)
                     {
                         return Observable.Throw<IEnumerable<UserCalendar>>(

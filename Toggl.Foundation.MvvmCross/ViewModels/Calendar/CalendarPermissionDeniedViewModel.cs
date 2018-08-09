@@ -39,9 +39,9 @@ namespace Toggl.Foundation.MvvmCross.ViewModels.Calendar
                 .SelectUnit();
 
         private IObservable<Unit> enableAccess()
-        {
-            permissionsService.OpenAppSettings();
-            return Observable.Return(Unit.Default);
-        }
+            => permissionsService
+                .RequestCalendarAuthorization(true)
+                .Do(_ => navigationService.Close(this))
+                .SelectUnit();
     }
 }
