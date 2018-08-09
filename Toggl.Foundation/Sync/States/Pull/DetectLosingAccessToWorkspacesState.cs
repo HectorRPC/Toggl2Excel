@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using Toggl.Foundation.DataSources.Interfaces;
+using Toggl.Foundation.Models;
 using Toggl.Foundation.Models.Interfaces;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
@@ -15,9 +17,7 @@ namespace Toggl.Foundation.Sync.States.Pull
     {
         private readonly IDataSource<IThreadSafeWorkspace, IDatabaseWorkspace> dataSource;
 
-        public StateResult<IEnumerable<IThreadSafeWorkspace>> LostAccessTo { get; } = new StateResult<IEnumerable<IThreadSafeWorkspace>>();
-
-        public StateResult NoAccessLost { get; } = new StateResult();
+        public StateResult<IFetchObservables> Continue { get; } = new StateResult<IFetchObservables>();
 
         public DetectLosingAccessToWorkspacesState(IDataSource<IThreadSafeWorkspace, IDatabaseWorkspace> dataSource)
         {
@@ -29,9 +29,8 @@ namespace Toggl.Foundation.Sync.States.Pull
         public IObservable<ITransition> Start(IFetchObservables fetchObservables)
             => fetchObservables.GetList<IWorkspace>()
                 .SelectMany(workspacesWhichWereNotFetched)
-                .Select(missingWorkspaces => missingWorkspaces.Any()
-                    ? LostAccessTo.Transition(missingWorkspaces)
-                    : (ITransition)NoAccessLost.Transition());
+                .SelectMany(markAsGhosts)
+                .Select(Continue.Transition(fetchObservables));
 
         private IObservable<IList<IThreadSafeWorkspace>> workspacesWhichWereNotFetched(List<IWorkspace> fetchedWorkspaces)
             => allStoredWorkspaces()
@@ -41,5 +40,15 @@ namespace Toggl.Foundation.Sync.States.Pull
         private IObservable<IThreadSafeWorkspace> allStoredWorkspaces()
             => dataSource.GetAll(ws => ws.Id > 0 && ws.IsGhost == false)
                          .SelectMany(CommonFunctions.Identity);
+
+        private IObservable<Unit> markAsGhosts(IList<IThreadSafeWorkspace> workspacesToMark)
+            => Observable.Return(workspacesToMark)
+                .SelectMany(CommonFunctions.Identity)
+                .SelectMany(markAsGhost)
+                .ToList()
+                .Select(Unit.Default);
+
+        private IObservable<IThreadSafeWorkspace> markAsGhost(IThreadSafeWorkspace workspaceToMark)
+            => dataSource.Update(workspaceToMark.AsGhost());
     }
 }
