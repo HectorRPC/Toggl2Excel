@@ -1,4 +1,5 @@
 ﻿using System;
+using Toggl.Foundation.Models.Interfaces;
 using Toggl.PrimeRadiant;
 
 namespace Toggl.Foundation.Models
@@ -53,5 +54,17 @@ namespace Toggl.Foundation.Models
             SyncStatus = builder.SyncStatus;
             At = builder.At;
         }
+
+        internal Workspace(IThreadSafeWorkspace workspace, bool isGhost)
+            : this(workspace)
+        {
+            IsGhost = isGhost;
+        }
+    }
+
+    public static class ThreadSafeWorkspaceExtensions
+    {
+        public static IThreadSafeWorkspace AsGhost(this IThreadSafeWorkspace workspace)
+            => new Workspace(workspace, isGhost: true);
     }
 }
