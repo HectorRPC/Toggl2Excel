@@ -12,6 +12,8 @@ namespace Toggl.Foundation.Interactors.Calendar
 {
     public sealed class GetCalendarItemsForDateInteractor : IInteractor<IObservable<IEnumerable<CalendarItem>>>
     {
+        private readonly TimeSpan maxDurationThreshold = TimeSpan.FromHours(24);
+
         private readonly ITimeEntriesSource timeEntriesDataSource;
         private readonly ICalendarService calendarService;
         private readonly DateTime date;
@@ -35,6 +37,7 @@ namespace Toggl.Foundation.Interactors.Calendar
                     calendarItemsFromTimeEntries(),
                     calendarItemsFromEvents(),
                     (timeEntries, events) => timeEntries.Concat(events))
+                .Select(validEvents)
                 .Select(orderByStartTime);
 
         private IObservable<IEnumerable<CalendarItem>> calendarItemsFromTimeEntries()
@@ -46,6 +49,12 @@ namespace Toggl.Foundation.Interactors.Calendar
 
         private IEnumerable<CalendarItem> convertTimeEntriesToCalendarItems(IEnumerable<IThreadSafeTimeEntry> timeEntries)
             => timeEntries.Select(CalendarItem.From);
+
+        private IEnumerable<CalendarItem> validEvents(IEnumerable<CalendarItem> calendarItems)
+            => calendarItems.Where(eventHasValidDuration);
+
+        private bool eventHasValidDuration(CalendarItem calendarItem)
+            => calendarItem.Duration < maxDurationThreshold;
 
         private IEnumerable<CalendarItem> orderByStartTime(IEnumerable<CalendarItem> calendarItems)
             => calendarItems.OrderBy(calendarItem => calendarItem.StartTime);
