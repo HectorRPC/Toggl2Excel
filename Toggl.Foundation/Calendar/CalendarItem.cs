@@ -1,4 +1,5 @@
 ﻿using System;
+using Toggl.Foundation.Models;
 using Toggl.Foundation.Models.Interfaces;
 using ColorHelper = Toggl.Foundation.Helper.Color;
 
@@ -47,5 +48,35 @@ namespace Toggl.Foundation.Calendar
 
         public static CalendarItem From(IThreadSafeTimeEntry timeEntry)
             => new CalendarItem(timeEntry);
+
+        public ITimeEntryPrototype AsTimeEntryPrototype(long workspaceId)
+            => new CalendarItemTimeEntryPrototype(this, workspaceId);
+
+        private sealed class CalendarItemTimeEntryPrototype : ITimeEntryPrototype
+        {
+            public long WorkspaceId { get; }
+
+            public string Description { get; }
+
+            public TimeSpan? Duration { get; }
+
+            public DateTimeOffset StartTime { get; }
+
+            public long? ProjectId => null;
+
+            public long? TaskId => null;
+
+            public long[] TagIds => null;
+
+            public bool IsBillable => false;
+
+            public CalendarItemTimeEntryPrototype(CalendarItem calendarItem, long workspaceId)
+            {
+                WorkspaceId = workspaceId;
+                Duration = calendarItem.Duration;
+                StartTime = calendarItem.StartTime;
+                Description = calendarItem.Description;
+            }
+        }
     }
 }
