@@ -3,7 +3,7 @@ using Foundation;
 using Toggl.Foundation.Calendar;
 using UIKit;
 
-namespace Toggl.Daneel.Views.Calendar
+namespace Toggl.Daneel.Views.Cells.Calendar
 {
     public sealed partial class CalendarItemView : ReactiveCollectionViewCell<CalendarItem>
     {

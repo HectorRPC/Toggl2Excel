@@ -7,19 +7,19 @@
 using Foundation;
 using System.CodeDom.Compiler;
 
-namespace Toggl.Daneel.Views.Calendar
+namespace Toggl.Daneel.Views.Cells.Calendar
 {
-	[Register ("HourSupplementaryView")]
-	partial class HourSupplementaryView
+	[Register ("CalendarItemView")]
+	partial class CalendarItemView
 	{
 		[Outlet]
-		UIKit.UILabel HourLabel { get; set; }
-		
+		UIKit.UILabel DescriptionLabel { get; set; }
+
 		void ReleaseDesignerOutlets ()
 		{
-			if (HourLabel != null) {
-				HourLabel.Dispose ();
-				HourLabel = null;
+			if (DescriptionLabel != null) {
+				DescriptionLabel.Dispose ();
+				DescriptionLabel = null;
 			}
 		}
 	}

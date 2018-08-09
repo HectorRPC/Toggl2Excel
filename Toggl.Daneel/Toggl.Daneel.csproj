@@ -592,9 +592,9 @@
     <InterfaceDefinition Include="Cells\Settings\LicensesViewCell.xib" />
     <InterfaceDefinition Include="ViewControllers\Settings\SendFeedbackViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\CalendarViewController.xib" />
-    <InterfaceDefinition Include="Views\Calendar\HourSupplementaryView.xib" />
-    <InterfaceDefinition Include="Views\Calendar\CurrentTimeSupplementaryView.xib" />
-    <InterfaceDefinition Include="Views\Calendar\CalendarItemView.xib" />
+    <InterfaceDefinition Include="Cells\Calendar\CalendarItemView.xib" />
+    <InterfaceDefinition Include="Cells\Calendar\CurrentTimeSupplementaryView.xib" />
+    <InterfaceDefinition Include="Cells\Calendar\HourSupplementaryView.xib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -1014,18 +1014,18 @@
     <Compile Include="ViewControllers\CalendarViewController.designer.cs">
       <DependentUpon>CalendarViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Calendar\HourSupplementaryView.cs" />
-    <Compile Include="Views\Calendar\HourSupplementaryView.designer.cs">
-      <DependentUpon>HourSupplementaryView.cs</DependentUpon>
+    <Compile Include="Views\Calendar\ICalendarCollectionViewLayoutDataSource.cs" />
+    <Compile Include="Cells\Calendar\CalendarItemView.cs" />
+    <Compile Include="Cells\Calendar\CalendarItemView.designer.cs">
+      <DependentUpon>CalendarItemView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Calendar\CurrentTimeSupplementaryView.cs" />
-    <Compile Include="Views\Calendar\CurrentTimeSupplementaryView.designer.cs">
+    <Compile Include="Cells\Calendar\CurrentTimeSupplementaryView.cs" />
+    <Compile Include="Cells\Calendar\CurrentTimeSupplementaryView.designer.cs">
       <DependentUpon>CurrentTimeSupplementaryView.cs</DependentUpon>
     </Compile>
-    <Compile Include="Views\Calendar\ICalendarCollectionViewLayoutDataSource.cs" />
-    <Compile Include="Views\Calendar\CalendarItemView.cs" />
-    <Compile Include="Views\Calendar\CalendarItemView.designer.cs">
-      <DependentUpon>CalendarItemView.cs</DependentUpon>
+    <Compile Include="Cells\Calendar\HourSupplementaryView.cs" />
+    <Compile Include="Cells\Calendar\HourSupplementaryView.designer.cs">
+      <DependentUpon>HourSupplementaryView.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -1083,6 +1083,7 @@
     <Folder Include="Resources\Images.xcassets\icBackNoPadding.imageset\" />
     <Folder Include="Resources\Images.xcassets\icWarning.imageset\" />
     <Folder Include="Resources\Images.xcassets\icCalendar.imageset\" />
+    <Folder Include="Cells\Calendar\" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="GoogleService-Info.plist" />
