@@ -88,7 +88,7 @@ namespace Toggl.Daneel
             var permissionsService = new PermissionsService();
             var userAgent = new UserAgent(clientName, version);
             var settingsStorage = new SettingsStorage(Version.Parse(version), keyValueStorage);
-            var calendarService = new CalendarService(settingsStorage, permissionsService);
+            var calendarService = new CalendarService(permissionsService);
 
             var foundation =
                 TogglFoundation

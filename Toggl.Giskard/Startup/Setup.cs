@@ -80,6 +80,8 @@ namespace Toggl.Giskard
             var keyValueStorage = new SharedPreferencesStorage(sharedPreferences);
             var settingsStorage = new SettingsStorage(appVersion, keyValueStorage);
             var feedbackService = new FeedbackService(userAgent, mailService, dialogService, platformConstants);
+            var permissionsService = new PermissionsService();
+            var calendarService = new CalendarService(permissionsService);
 
             var foundation =
                 TogglFoundation
@@ -105,14 +107,14 @@ namespace Toggl.Giskard
                     .WithFeedbackService(feedbackService)
                     .WithLastTimeUsageStorage(settingsStorage)
                     .WithBrowserService<BrowserService>()
+                    .WithCalendarService(calendarService)
                     .WithKeyValueStorage(keyValueStorage)
                     .WithUserPreferences(settingsStorage)
                     .WithOnboardingStorage(settingsStorage)
                     .WithNavigationService(navigationService)
+                    .WithPermissionsService(permissionsService)
                     .WithAccessRestrictionStorage(settingsStorage)
                     .WithErrorHandlingService(new ErrorHandlingService(navigationService, settingsStorage))
-                    .WithPermissionsService<PermissionsService>()
-                    .WithCalendarService<CalendarService>()
                     .Build();
 
             foundation.RevokeNewUserIfNeeded().Initialize();
