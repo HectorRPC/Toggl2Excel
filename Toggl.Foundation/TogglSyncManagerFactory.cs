@@ -82,8 +82,6 @@ namespace Toggl.Foundation
 
             var fetchAllSince = new FetchAllSinceState(database, api, timeService);
 
-            var detectLosingAccessToWorkspaces = new DetectLosingAccessToWorkspacesState(dataSource.Workspaces);
-
             var persistWorkspaces =
                 new PersistListState<IWorkspace, IDatabaseWorkspace, IThreadSafeWorkspace>(dataSource.Workspaces, Workspace.Clean);
 
@@ -142,9 +140,8 @@ namespace Toggl.Foundation
             var deleteNonReferencedGhostProjects = new DeleteNonReferencedProjectGhostsState(dataSource.Projects, dataSource.TimeEntries);
 
             transitions.ConfigureTransition(entryPoint, fetchAllSince);
-            transitions.ConfigureTransition(fetchAllSince.FetchStarted, detectLosingAccessToWorkspaces);
+            transitions.ConfigureTransition(fetchAllSince.FetchStarted, persistWorkspaces);
 
-            transitions.ConfigureTransition(detectLosingAccessToWorkspaces.Continue, persistWorkspaces);
             transitions.ConfigureTransition(persistWorkspaces.FinishedPersisting, updateWorkspacesSinceDate);
             transitions.ConfigureTransition(updateWorkspacesSinceDate.Finished, detectNoWorkspaceState);
             transitions.ConfigureTransition(detectNoWorkspaceState.Continue, persistUser);
