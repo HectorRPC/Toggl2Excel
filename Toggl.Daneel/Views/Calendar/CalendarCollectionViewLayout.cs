@@ -21,13 +21,14 @@ namespace Toggl.Daneel.Views.Calendar
         private static readonly nfloat hourSupplementaryLabelHeight = 20;
         private static readonly nfloat currentTimeSupplementaryLeftOffset = -18;
 
-        private ITimeService timeService;
-        private ICalendarCollectionViewLayoutDataSource dataSource;
+        private readonly ITimeService timeService;
+        private readonly ICalendarCollectionViewLayoutDataSource dataSource;
 
         public static NSString HourSupplementaryViewKind = new NSString("Hour");
         public static NSString CurrentTimeSupplementaryViewKind = new NSString("CurrentTime");
 
-        public CalendarCollectionViewLayout(ITimeService timeService, ICalendarCollectionViewLayoutDataSource dataSource) : base()
+        public CalendarCollectionViewLayout(ITimeService timeService, ICalendarCollectionViewLayoutDataSource dataSource)
+            : base()
         {
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));

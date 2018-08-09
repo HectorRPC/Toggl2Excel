@@ -61,6 +61,13 @@ namespace Toggl.Multivac
 
                 throw new ArgumentException("Invalid enum value.", argumentName);
             }
+
+            public static void IsInClosedRange<T>(T value, T lowerBound, T upperBound, string argumentName) where T : IComparable
+            {
+                if (value.CompareTo(lowerBound) >= 0 && value.CompareTo(upperBound) <= 0) return;
+
+                throw new ArgumentException("Value is in out of bounds.", argumentName);
+            }
         }
     }
 }

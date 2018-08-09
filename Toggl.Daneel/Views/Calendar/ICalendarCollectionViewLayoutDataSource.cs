@@ -4,7 +4,7 @@ using Foundation;
 
 namespace Toggl.Daneel.Views.Calendar
 {
-	public interface ICalendarCollectionViewLayoutDataSource
+    public interface ICalendarCollectionViewLayoutDataSource
     {
         IEnumerable<NSIndexPath> IndexPathsOfCalendarItemsBetweenHours(int minHour, int maxHour);
 
