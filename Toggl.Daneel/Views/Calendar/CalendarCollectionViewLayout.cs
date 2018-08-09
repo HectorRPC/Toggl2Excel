@@ -21,8 +21,8 @@ namespace Toggl.Daneel.Views.Calendar
         private static readonly nfloat hourSupplementaryLabelHeight = 20;
         private static readonly nfloat currentTimeSupplementaryLeftOffset = -18;
 
-        private ITimeService timeService { get; }
-        private ICalendarCollectionViewLayoutDataSource dataSource { get; }
+        private ITimeService timeService;
+        private ICalendarCollectionViewLayoutDataSource dataSource;
 
         public static NSString HourSupplementaryViewKind = new NSString("Hour");
         public static NSString CurrentTimeSupplementaryViewKind = new NSString("CurrentTime");
