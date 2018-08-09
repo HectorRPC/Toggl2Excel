@@ -13,6 +13,17 @@
         public UserCalendar(
             string id,
             string name,
+            string sourceName)
+        {
+            Id = id;
+            Name = name;
+            IsSelected = false;
+            SourceName = sourceName;
+        }
+
+        public UserCalendar(
+            string id,
+            string name,
             string sourceName,
             bool isSelected)
         {
@@ -21,5 +32,8 @@
             SourceName = sourceName;
             IsSelected = isSelected;
         }
+
+        public UserCalendar WithSelected(bool selected)
+            => new UserCalendar(Id, Name, SourceName, selected);
     }
 }

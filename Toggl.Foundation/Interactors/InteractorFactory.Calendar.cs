@@ -13,7 +13,7 @@ namespace Toggl.Foundation.Interactors
             => new GetCalendarItemsForDateInteractor(dataSource.TimeEntries, calendarService, date);
 
         public IInteractor<IObservable<IEnumerable<UserCalendar>>> GetUserCalendars()
-            => new GetUserCalendarsInteractor(calendarService);
+            => new GetUserCalendarsInteractor(calendarService, userPreferences);
 
         public IInteractor<Unit> SetEnabledCalendars(params string[] ids)
             => new SetEnabledCalendarsInteractor(userPreferences, ids);

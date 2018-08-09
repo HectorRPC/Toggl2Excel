@@ -25,16 +25,13 @@ namespace Toggl.Daneel.Services
         protected override IEnumerable<UserCalendar> NativeGetUserCalendars()
             => eventStore
                 .GetCalendars(EKEntityType.Event)
-                .Select(ekCalendar => userCalendarFromEKCalendar(
-                    calendar: ekCalendar,
-                    selected: selectedIds.Contains(ekCalendar.CalendarIdentifier))
-                );
+                .Select(userCalendarFromEKCalendar);
         
-        private UserCalendar userCalendarFromEKCalendar(EKCalendar calendar, bool selected)
+        private UserCalendar userCalendarFromEKCalendar(EKCalendar calendar)
             => new UserCalendar(
                 calendar.CalendarIdentifier,
                 calendar.Title,
-                calendar.Source.Title,
-                selected);
+                calendar.Source.Title
+            );
     }
 }
