@@ -38,7 +38,7 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
             private readonly IFetchObservables fetchObservables = Substitute.For<IFetchObservables>();
 
             [Fact]
-            public async Task ReturnsListOfWorkspacesWhichAreStoredLocallyButAreNotInTheListFromTheServer()
+            public async Task ReturnsFetchObservablesAsParameterOfTransition()
             {
                 prepareDatabase(new[]
                 {
@@ -53,12 +53,33 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
                 var state = new DetectLosingAccessToWorkspacesState(dataSource);
 
                 var transition = await state.Start(fetchObservables);
-                var parameter = ((Transition<IEnumerable<IThreadSafeWorkspace>>)transition).Parameter.ToList();
+                var parameter = ((Transition<IFetchObservables>)transition).Parameter;
 
-                transition.Result.Should().Be(state.LostAccessTo);
-                parameter.Should().HaveCount(2);
-                parameter.Should().Contain(ws => ws.Id == 2);
-                parameter.Should().Contain(ws => ws.Id == 3);
+                parameter.Should().Be(fetchObservables);
+            }
+
+            [Fact]
+            public async Task MarksWorkspacesWhichAreStoredLocallyButAreNotInTheListFromTheServerAsGhosts()
+            {
+                prepareDatabase(new[]
+                {
+                    new MockWorkspace { Id = 1 },
+                    new MockWorkspace { Id = 2 },
+                    new MockWorkspace { Id = 3 }
+                });
+                prepareFetch(new List<IWorkspace>
+                {
+                    new MockWorkspace { Id = 1 }
+                });
+                var state = new DetectLosingAccessToWorkspacesState(dataSource);
+
+                var transition = await state.Start(fetchObservables);
+
+                transition.Result.Should().Be(state.Continue);
+                await dataSource.Received()
+                    .Update(Arg.Is<IThreadSafeWorkspace>(workspace => workspace.Id == 2 && workspace.IsGhost));
+                await dataSource.Received()
+                    .Update(Arg.Is<IThreadSafeWorkspace>(workspace => workspace.Id == 3 && workspace.IsGhost));
             }
 
             [Fact]
@@ -77,11 +98,10 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
                 var state = new DetectLosingAccessToWorkspacesState(dataSource);
 
                 var transition = await state.Start(fetchObservables);
-                var parameter = ((Transition<IEnumerable<IThreadSafeWorkspace>>)transition).Parameter.ToList();
 
-                transition.Result.Should().Be(state.LostAccessTo);
-                parameter.Should().HaveCount(1);
-                parameter[0].Id.Should().Be(2);
+                transition.Result.Should().Be(state.Continue);
+                await dataSource.Received()
+                    .Update(Arg.Is<IThreadSafeWorkspace>(workspace => workspace.Id == 2 && workspace.IsGhost));
             }
 
             [Fact]
@@ -100,33 +120,32 @@ namespace Toggl.Foundation.Tests.Sync.States.Pull
                 var state = new DetectLosingAccessToWorkspacesState(dataSource);
 
                 var transition = await state.Start(fetchObservables);
-                var parameter = ((Transition<IEnumerable<IThreadSafeWorkspace>>)transition).Parameter.ToList();
 
-                transition.Result.Should().Be(state.LostAccessTo);
-                parameter.Should().HaveCount(1);
-                parameter[0].Id.Should().Be(2);
+                transition.Result.Should().Be(state.Continue);
+                await dataSource.Received()
+                    .Update(Arg.Is<IThreadSafeWorkspace>(workspace => workspace.Id == 2 && workspace.IsGhost));
             }
 
             [Fact]
-            public async Task ReturnsNoAccessLostResultWhenNoAccessIsLost()
+            public async Task DoesNotMarkAnyWorkspaceAsGhostWhenNoAccessIsLostSinceLastTime()
             {
                 prepareDatabase(new[]
                 {
                     new MockWorkspace { Id = 1 },
                     new MockWorkspace { Id = 2 },
-                    new MockWorkspace { Id = 3 }
+                    new MockWorkspace { Id = 3, IsGhost = true }
                 });
                 prepareFetch(new List<IWorkspace>
                 {
                     new MockWorkspace { Id = 1 },
-                    new MockWorkspace { Id = 2 },
-                    new MockWorkspace { Id = 3 }
+                    new MockWorkspace { Id = 2 }
                 });
                 var state = new DetectLosingAccessToWorkspacesState(dataSource);
 
                 var transition = await state.Start(fetchObservables);
 
-                transition.Result.Should().Be(state.NoAccessLost);
+                transition.Result.Should().Be(state.Continue);
+                await dataSource.DidNotReceive().Update(Arg.Any<IThreadSafeWorkspace>());
             }
 
             private void prepareDatabase(IEnumerable<IThreadSafeWorkspace> workspaces)
