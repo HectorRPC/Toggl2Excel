@@ -268,6 +268,7 @@ namespace Toggl.Foundation.Models
         private Workspace(IDatabaseWorkspace entity)
             : this(entity as IWorkspace, entity.SyncStatus, entity.LastSyncErrorMessage, entity.IsDeleted)
         {
+            IsGhost = entity.IsGhost;
             SyncStatus = entity.SyncStatus;
             LastSyncErrorMessage = entity.LastSyncErrorMessage;
             IsDeleted = entity.IsDeleted;
