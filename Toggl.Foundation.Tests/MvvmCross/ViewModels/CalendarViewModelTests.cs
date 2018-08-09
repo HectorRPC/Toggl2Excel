@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
 using FluentAssertions;
-using NUnit.Framework;
-using Toggl.Foundation.MvvmCross.ViewModels;
+using NSubstitute;
+using Toggl.Foundation.MvvmCross.ViewModels.Calendar;
 using Toggl.Foundation.Tests.Generators;
+using Xunit;
 
 namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 {
@@ -14,6 +18,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 => new CalendarViewModel(
                     TimeService,
                     InteractorFactory,
+                    OnboardingStorage,
                     PermissionsService,
                     NavigationService);
         }
@@ -25,11 +30,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useTimeService,
                 bool useInteractorFactory,
+                bool useOnboardingStorage,
                 bool useNavigationService,
                 bool usePermissionsService)
             {
                 var timeService = useTimeService ? TimeService : null;
                 var interactorFactory = useInteractorFactory ? InteractorFactory : null;
+                var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
                 var navigationService = useNavigationService ? NavigationService : null;
                 var permissionsService = usePermissionsService ? PermissionsService : null;
 
@@ -37,10 +44,50 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     () => new CalendarViewModel(
                         timeService,
                         interactorFactory,
+                        onboardingStorage,
                         permissionsService,
                         navigationService);
 
                 tryingToConstructWithEmptyParameters.Should().Throw<ArgumentNullException>();
+            }
+        }
+
+        public sealed class TheShouldShowOnboardingProperty : CalendarViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public async Task ReturnsTrueIfCalendarOnboardingHasntBeenCompleted()
+            {
+                (await ViewModel.ShouldShowOnboarding).Should().BeTrue();
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task ReturnsFalseIfCalendarOnboardingHasBeenCompleted()
+            {
+                OnboardingStorage.CompletedCalendarOnboarding().Returns(true);
+                var viewModel = CreateViewModel();
+
+                (await viewModel.ShouldShowOnboarding).Should().BeFalse();
+            }
+        }
+
+        public sealed class TheGetStartedAction : CalendarViewModelTest
+        {
+            [Fact, LogIfTooSlow]
+            public async Task RequestsCalendarPermission()
+            {
+                await ViewModel.GetStartedAction.Execute(Unit.Default);
+
+                await PermissionsService.Received().RequestCalendarAuthorization();
+            }
+
+            [Fact, LogIfTooSlow]
+            public async Task NavigatesToTheCalendarPermissionDeniedViewModelWhenPermissionIsDenied()
+            {
+                PermissionsService.RequestCalendarAuthorization().Returns(Observable.Return(false));
+
+                await ViewModel.GetStartedAction.Execute(Unit.Default);
+
+                await NavigationService.Received().Navigate<CalendarPermissionDeniedViewModel>();
             }
         }
     }

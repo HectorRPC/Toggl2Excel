@@ -23,10 +23,12 @@ namespace Toggl.PrimeRadiant.Settings
         void SetUserSignedUp();
         void SetNavigatedAwayFromMainViewAfterStopButton();
         void SetTimeEntryContinued();
+        void SetCompletedCalendarOnboarding();
 
         string GetLastOpened();
         DateTimeOffset? GetFirstOpened();
         bool CompletedOnboarding();
+        bool CompletedCalendarOnboarding();
 
         void StartButtonWasTapped();
         void TimeEntryWasTapped();

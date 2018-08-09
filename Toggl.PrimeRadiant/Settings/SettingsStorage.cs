@@ -20,6 +20,7 @@ namespace Toggl.PrimeRadiant.Settings
         private const string lastAccessDateKey = "LastAccessDate";
         private const string firstAccessDateKey = "FirstAccessDate";
         private const string completedOnboardingKey = "CompletedOnboarding";
+        private const string completedCalendarOnboardingKey = "CompletedCalendarOnboarding";
 
         private const string preferManualModeKey = "PreferManualMode";
 
@@ -186,7 +187,14 @@ namespace Toggl.PrimeRadiant.Settings
             keyValueStorage.SetBool(completedOnboardingKey, true);
         }
 
+        public void SetCompletedCalendarOnboarding()
+        {
+            keyValueStorage.SetBool(completedCalendarOnboardingKey, true);
+        }
+
         public bool CompletedOnboarding() => keyValueStorage.GetBool(completedOnboardingKey);
+
+        public bool CompletedCalendarOnboarding() => keyValueStorage.GetBool(completedCalendarOnboardingKey);
 
         public string GetLastOpened() => keyValueStorage.GetString(lastAccessDateKey);
 

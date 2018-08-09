@@ -528,6 +528,14 @@
     <ImageAsset Include="Resources\Images.xcassets\icCalendar.imageset\icCalendar.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCalendar.imageset\icCalendar%402x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icCalendar.imageset\icCalendar%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationCalendar.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationCalendar.imageset\icIllustrationCalendar.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationCalendar.imageset\icIllustrationCalendar%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationCalendar.imageset\icIllustrationCalendar%403x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationErrorSpider.imageset\Contents.json" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationErrorSpider.imageset\icIllustrationErrorSpider.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationErrorSpider.imageset\icIllustrationErrorSpider%402x.png" />
+    <ImageAsset Include="Resources\Images.xcassets\icIllustrationErrorSpider.imageset\icIllustrationErrorSpider%403x.png" />
     <ImageAsset Include="Resources\Images.xcassets\icWorkspace.imageset\Contents.json" />
     <ImageAsset Include="Resources\Images.xcassets\icWorkspace.imageset\icWorkspace.png" />
     <ImageAsset Include="Resources\Images.xcassets\icWorkspace.imageset\icWorkspace%402x.png" />
@@ -601,7 +609,8 @@
     <InterfaceDefinition Include="ViewControllers\NoWorkspaceViewController.xib" />
     <InterfaceDefinition Include="ViewControllers\Settings\SendFeedbackViewController.xib" />
     <InterfaceDefinition Include="Views\CalendarItemView.xib" />
-    <InterfaceDefinition Include="ViewControllers\CalendarViewController.xib" />
+    <InterfaceDefinition Include="ViewControllers\Calendar\CalendarViewController.xib" />
+    <InterfaceDefinition Include="ViewControllers\Calendar\CalendarPermissionDeniedViewController.xib" />
     <InterfaceDefinition Include="Views\SnackBar.xib" />
   </ItemGroup>
   <ItemGroup>
@@ -1018,9 +1027,13 @@
       <DependentUpon>CalendarItemView.cs</DependentUpon>
     </Compile>
     <Compile Include="Views\ReactiveCollectionViewCell.cs" />
-    <Compile Include="ViewControllers\CalendarViewController.cs" />
-    <Compile Include="ViewControllers\CalendarViewController.designer.cs">
+    <Compile Include="ViewControllers\Calendar\CalendarViewController.cs" />
+    <Compile Include="ViewControllers\Calendar\CalendarViewController.designer.cs">
       <DependentUpon>CalendarViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewControllers\Calendar\CalendarPermissionDeniedViewController.cs" />
+    <Compile Include="ViewControllers\Calendar\CalendarPermissionDeniedViewController.designer.cs">
+      <DependentUpon>CalendarPermissionDeniedViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Converters\LambdaConverter.cs" />
     <Compile Include="Views\SnackBar.cs" />
@@ -1088,6 +1101,9 @@
     <Folder Include="Resources\Images.xcassets\icBackNoPadding.imageset\" />
     <Folder Include="Resources\Images.xcassets\icWarning.imageset\" />
     <Folder Include="Resources\Images.xcassets\icCalendar.imageset\" />
+    <Folder Include="Resources\Images.xcassets\icIllustrationCalendar.imageset\" />
+    <Folder Include="ViewControllers\Calendar\" />
+    <Folder Include="Resources\Images.xcassets\icIllustrationErrorSpider.imageset\" />
     <Folder Include="Resources\Images.xcassets\icIllustrationErrorWorkspace.imageset\" />
   </ItemGroup>
   <ItemGroup>

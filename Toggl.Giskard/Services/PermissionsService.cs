@@ -8,16 +8,13 @@ namespace Toggl.Giskard.Services
     [Preserve(AllMembers = true)]
     public sealed class PermissionsService : IPermissionsService
     {
-        public IObservable<bool> CalendarAuthorizationStatus => Observable.Return(false);
+        public bool CalendarAuthorizationStatus => false;
 
-        public void RequestCalendarAuthorization(bool force = false)
-        {
-            // Nothing to do here...
-        }
+        public IObservable<bool> RequestCalendarAuthorization(bool force = false)
+            => Observable.Return(false);
 
-        public void EnterForeground()
+        public void OpenAppSettings()
         {
-            // Nothing to do here...
         }
     }
 }
