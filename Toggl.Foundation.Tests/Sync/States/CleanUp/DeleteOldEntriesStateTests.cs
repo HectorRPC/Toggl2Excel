@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using NSubstitute;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Models.Interfaces;
-using Toggl.Foundation.Sync.States;
+using Toggl.Foundation.Sync.States.CleanUp;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 using Xunit;
 
-namespace Toggl.Foundation.Tests.Sync.States
+namespace Toggl.Foundation.Tests.Sync.States.CleanUp
 {
     public sealed class DeleteOldEntriesStateTests
     {

@@ -7,7 +7,7 @@ using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 
-namespace Toggl.Foundation.Sync.States.Pull
+namespace Toggl.Foundation.Sync.States.CleanUp
 {
     public sealed class DeleteNonReferencedProjectGhostsState : ISyncState
     {

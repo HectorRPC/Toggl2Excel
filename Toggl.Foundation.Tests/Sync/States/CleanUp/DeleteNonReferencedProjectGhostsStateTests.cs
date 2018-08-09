@@ -8,14 +8,14 @@ using FluentAssertions;
 using NSubstitute;
 using Toggl.Foundation.DataSources;
 using Toggl.Foundation.Models.Interfaces;
-using Toggl.Foundation.Sync.States.Pull;
+using Toggl.Foundation.Sync.States.CleanUp;
 using Toggl.Foundation.Tests.Mocks;
 using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 using Xunit;
 
-namespace Toggl.Foundation.Tests.Sync.States.Pull
+namespace Toggl.Foundation.Tests.Sync.States.CleanUp
 {
     public sealed class DeleteNonReferencedProjectGhostsStateTests
     {

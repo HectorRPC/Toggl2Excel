@@ -5,7 +5,7 @@ using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Models;
 
-namespace Toggl.Foundation.Sync.States
+namespace Toggl.Foundation.Sync.States.CleanUp
 {
     internal class DeleteOldEntriesState : ISyncState
     {
