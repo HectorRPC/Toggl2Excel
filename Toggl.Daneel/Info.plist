@@ -54,11 +54,11 @@
 			</array>
 		</dict>
 		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb{TOGGL_FACEBOOK_APP_ID}</string>
-			</array>
-		</dict>
+  			<key>CFBundleURLSchemes</key>
+  			<array>
+    			<string>fb{TOGGL_FACEBOOK_APP_ID}</string>
+  			</array>
+  		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>IOS_BUNDLE_VERSION</string>

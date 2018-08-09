@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-﻿using System;
-=======
 using System;
->>>>>>> Stashed changes
 using Android.App;
 using Android.Runtime;
 using MvvmCross.Droid.Support.V7.AppCompat;
