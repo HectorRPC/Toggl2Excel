@@ -18,7 +18,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         public abstract class SendFeedbackViewModelTest : BaseViewModelTests<SendFeedbackViewModel>
         {
             protected override SendFeedbackViewModel CreateViewModel()
-                => new SendFeedbackViewModel(NavigationService, InteractorFactory, DialogService);
+                => new SendFeedbackViewModel(NavigationService, InteractorFactory, DialogService, SchedulerProvider);
         }
 
         public sealed class TheConstructor : SendFeedbackViewModelTest
@@ -28,15 +28,17 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useNavigationService,
                 bool useInteractorFactory,
-                bool useDialogService
+                bool useDialogService,
+                bool useSchedulerProvider
             )
             {
                 var navigationService = useNavigationService ? NavigationService : null;
                 var interactorFactory = useInteractorFactory ? InteractorFactory : null;
                 var dialogService = useDialogService ? DialogService : null;
+                var schedulerProvider = useSchedulerProvider ? SchedulerProvider : null;
 
                 Action tryingToConstructWithEmptyParameters = ()
-                    => new SendFeedbackViewModel(navigationService, interactorFactory, dialogService);
+                    => new SendFeedbackViewModel(navigationService, interactorFactory, dialogService, schedulerProvider);
 
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
@@ -56,6 +58,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.FeedbackText.OnNext(string.Empty);
 
+                TestScheduler.Start();
                 observer.Messages.Select(r => r.Value.Value).TakeLast(3).AssertEqual(true, false, true);
             }
 
@@ -66,6 +69,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var viewModel = CreateViewModel();
 
                 viewModel.IsFeedbackEmpty.Subscribe(observer);
+
+                TestScheduler.Start();
                 observer.Messages.First().Value.Value.Should().BeTrue();
             }
         }
@@ -79,6 +84,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var viewModel = CreateViewModel();
 
                 viewModel.SendEnabled.Subscribe(observer);
+
+                TestScheduler.Start();
                 observer.Messages.Single().Value.Value.Should().BeFalse();
             }
 
@@ -87,13 +94,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var observer = TestScheduler.CreateObserver<bool>();
                 var viewModel = CreateViewModel();
-
                 viewModel.SendEnabled.Subscribe(observer);
 
                 viewModel.FeedbackText.OnNext(string.Empty);
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.FeedbackText.OnNext(string.Empty);
 
+                TestScheduler.Start();
                 observer.Messages.TakeLast(3).Select(r => r.Value.Value).AssertEqual(false, true, false);
             }
 
@@ -102,12 +109,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             {
                 var observer = TestScheduler.CreateObserver<bool>();
                 var viewModel = CreateViewModel();
-
                 viewModel.SendEnabled.Subscribe(observer);
 
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.SendButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeTrue();
             }
         }
@@ -117,7 +124,6 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
             [Fact, LogIfTooSlow]
             public void EmitsTrueWhenFeedbackBeingSent()
             {
-
                 SynchronizationContext.SetSynchronizationContext(new SynchronizationContext());
 
                 var mockedFeedbackInteractor = Substitute.For<IInteractor<IObservable<Unit>>>();
@@ -130,6 +136,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.SendButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeTrue();
             }
 
@@ -146,6 +153,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.SendButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeFalse();
             }
 
@@ -162,6 +170,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.SendButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeFalse();
             }
 
@@ -174,6 +183,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 viewModel.IsLoading.StartWith(true).Subscribe(observer);
                 viewModel.CloseButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeFalse();
             }
         }
@@ -187,9 +197,9 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var viewModel = CreateViewModel();
 
                 viewModel.ErrorViewVisible.StartWith(true).Subscribe(observer);
-
                 viewModel.ErrorViewTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeFalse();
             }
 
@@ -199,16 +209,15 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
                 var mockedFeedbackInteractor = Substitute.For<IInteractor<IObservable<Unit>>>();
                 InteractorFactory.SendFeedback(Arg.Any<string>()).Returns(mockedFeedbackInteractor);
-
                 var observer = TestScheduler.CreateObserver<bool>();
                 var viewModel = CreateViewModel();
 
                 viewModel.ErrorViewVisible.StartWith(false).Subscribe(observer);
                 mockedFeedbackInteractor.Execute().Returns(Observable.Throw<Unit>(new Exception()));
-
                 viewModel.FeedbackText.OnNext("some value");
                 viewModel.SendButtonTapped.OnNext(Unit.Default);
 
+                TestScheduler.Start();
                 observer.Messages.Last().Value.Value.Should().BeTrue();
             }
         }

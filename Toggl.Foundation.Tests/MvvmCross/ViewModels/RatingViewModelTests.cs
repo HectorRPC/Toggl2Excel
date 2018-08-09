@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
-using System.Reactive.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
-using FsCheck.Xunit;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
+using NUnit.Framework;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.MvvmCross.ViewModels;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
@@ -36,12 +35,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     RatingService,
                     AnalyticsService,
                     OnboardingStorage,
-                    NavigationService);
+                    NavigationService,
+                    SchedulerProvider);
         }
 
         public sealed class TheConstructor : RatingViewModelTest
         {
-            [Theory, LogIfTooSlow]
+            [Xunit.Theory, LogIfTooSlow]
             [ConstructorData]
             public void ThrowsIfAnyOfTheArgumentsIsNull(
                 bool useDataSource,
@@ -49,7 +49,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 bool useRatingService,
                 bool useAnalyticsService,
                 bool useOnboardingStorage,
-                bool useNavigationService)
+                bool useNavigationService,
+                bool useSchedulerProvider)
             {
                 var dataSource = useDataSource ? DataSource : null;
                 var timeService = useTimeService ? TimeService : null;
@@ -57,6 +58,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 var analyticsService = useAnalyticsService ? AnalyticsService : null;
                 var onboardingStorage = useOnboardingStorage ? OnboardingStorage : null;
                 var navigationService = useNavigationService ? NavigationService : null;
+                var schedulerProvider = useSchedulerProvider ? SchedulerProvider : null;
 
                 Action tryingToConstructWithEmptyParameters =
                     () => new RatingViewModel(
@@ -65,7 +67,8 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                         ratingService,
                         analyticsService,
                         onboardingStorage,
-                        navigationService);
+                        navigationService,
+                        schedulerProvider);
 
                 tryingToConstructWithEmptyParameters
                     .Should().Throw<ArgumentNullException>();
@@ -74,18 +77,21 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
 
         public sealed class TheRegisterImpressionMethod : RatingViewModelTest
         {
-            [Property]
+            [FsCheck.Xunit.Property]
             public void EmitsNewImpression(bool impressionIsPositive)
             {
-                var observer = Substitute.For<IObserver<bool?>>();
-                ViewModel.Impression.Subscribe(observer);
+                var expectedValues = new[] { (bool?)null, impressionIsPositive };
+                var actualValues = new List<bool?>();
+                var viewModel = CreateViewModel();
+                viewModel.Impression.Subscribe(actualValues.Add);
 
-                ViewModel.RegisterImpression(impressionIsPositive);
+                viewModel.RegisterImpression(impressionIsPositive);
 
-                observer.Received().OnNext(impressionIsPositive);
+                TestScheduler.Start();
+                CollectionAssert.AreEqual(expectedValues, actualValues);
             }
 
-            [Property]
+            [FsCheck.Xunit.Property]
             public void TracksTheUserFinishedRatingViewFirstStepEvent(bool impressionIsPositive)
             {
                 ViewModel.RegisterImpression(impressionIsPositive);
@@ -104,31 +110,43 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                 [Fact, LogIfTooSlow]
                 public void SetsTheAppropriateCtaTitle()
                 {
-                    var observer = Substitute.For<IObserver<string>>();
+                    var observer = TestScheduler.CreateObserver<string>();
                     ViewModel.CtaTitle.Subscribe(observer);
                     ViewModel.RegisterImpression(ImpressionIsPositive);
 
-                    observer.Received().OnNext(ExpectedCtaTitle);
+                    TestScheduler.Start();
+                    observer.Messages.AssertEqual(
+                        ReactiveTest.OnNext(1, ""),
+                        ReactiveTest.OnNext(2, ExpectedCtaTitle)
+                    );
                 }
 
                 [Fact, LogIfTooSlow]
                 public void SetsTheAppropriateCtaDescription()
                 {
-                    var observer = Substitute.For<IObserver<string>>();
+                    var observer = TestScheduler.CreateObserver<string>();
                     ViewModel.CtaDescription.Subscribe(observer);
                     ViewModel.RegisterImpression(ImpressionIsPositive);
 
-                    observer.Received().OnNext(ExpectedCtaDescription);
+                    TestScheduler.Start();
+                    observer.Messages.AssertEqual(
+                        ReactiveTest.OnNext(1, ""),
+                        ReactiveTest.OnNext(2, ExpectedCtaDescription)
+                    );
                 }
 
                 [Fact, LogIfTooSlow]
                 public void SetsTheAppropriateCtaButtonTitle()
                 {
-                    var observer = Substitute.For<IObserver<string>>();
+                    var observer = TestScheduler.CreateObserver<string>();
                     ViewModel.CtaButtonTitle.Subscribe(observer);
                     ViewModel.RegisterImpression(ImpressionIsPositive);
 
-                    observer.Received().OnNext(ExpectedCtaButtonTitle);
+                    TestScheduler.Start();
+                    observer.Messages.AssertEqual(
+                        ReactiveTest.OnNext(1, ""),
+                        ReactiveTest.OnNext(2, ExpectedCtaButtonTitle)
+                    );
                 }
 
                 [Fact, LogIfTooSlow]
@@ -303,9 +321,12 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
                     var observer = TestScheduler.CreateObserver<bool>();
                     var viewModel = CreateViewModel();
 
-                    viewModel.IsFeedbackSuccessViewShowing.StartWith(true).Subscribe(observer);
+                    viewModel.IsFeedbackSuccessViewShowing.Subscribe(observer);
                     viewModel.CloseFeedbackSuccessView();
-                    observer.Messages.Last().Value.Value.Should().BeFalse();
+                    TestScheduler.Start();
+                    observer.Messages.AssertEqual(
+                        ReactiveTest.OnNext(1, false)
+                    );
                 }
             }
         }

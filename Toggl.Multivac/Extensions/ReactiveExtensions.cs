@@ -4,7 +4,6 @@ using System.Reactive.Disposables;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Threading;
 
 namespace Toggl.Multivac.Extensions
 {
@@ -77,11 +76,16 @@ namespace Toggl.Multivac.Extensions
         public static IObservable<T> Share<T>(this IObservable<T> observable)
             => observable.Publish().RefCount();
 
-        public static IObservable<T> AsDriver<T>(this IObservable<T> observable, T onErrorJustReturn)
-            => observable
+        public static IObservable<T> AsDriver<T>(this IObservable<T> observable, T onErrorJustReturn, ISchedulerProvider schedulerProvider)
+        {
+            if (schedulerProvider.MainScheduler == null)
+                throw new InvalidOperationException("You need to set the MainThreadScheduler property before using the AsDriver extension");
+
+            return observable
                 .Replay(1).RefCount()
                 .Catch(Observable.Return(onErrorJustReturn))
-                .ObserveOn(SynchronizationContext.Current);
+                .ObserveOn(schedulerProvider.MainScheduler);
+        }
 
         public static IObservable<TValue> NotNullable<TValue>(this IObservable<TValue?> observable)
             where TValue : struct

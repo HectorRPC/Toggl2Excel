@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using FluentAssertions;
+using Microsoft.Reactive.Testing;
 using MvvmCross.Navigation;
 using NSubstitute;
 using Toggl.Foundation.Analytics;
@@ -11,6 +12,7 @@ using Toggl.Foundation.Services;
 using Toggl.Foundation.Shortcuts;
 using Toggl.Foundation.Suggestions;
 using Toggl.Foundation.Tests.Generators;
+using Toggl.Multivac;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave.Network;
@@ -38,10 +40,12 @@ namespace Toggl.Foundation.Tests.MvvmCross
         private readonly IRemoteConfigService remoteConfigService = Substitute.For<IRemoteConfigService>();
         private readonly IApplicationShortcutCreator applicationShortcutCreator = Substitute.For<IApplicationShortcutCreator>();
         private readonly ISuggestionProviderContainer suggestionProviderContainer = Substitute.For<ISuggestionProviderContainer>();
+        private readonly ISchedulerProvider schedulerProvider = new TestSchedulerProvider();
 
         private readonly IDialogService dialogService = Substitute.For<IDialogService>();
         private readonly IBrowserService browserService = Substitute.For<IBrowserService>();
         private readonly IKeyValueStorage keyValueStorage = Substitute.For<IKeyValueStorage>();
+        private readonly IFeedbackService feedbackService = Substitute.For<IFeedbackService>();
         private readonly IUserPreferences userPreferences = Substitute.For<IUserPreferences>();
         private readonly IOnboardingStorage onboardingStorage = Substitute.For<IOnboardingStorage>();
         private readonly IMvxNavigationService navigationService = Substitute.For<IMvxNavigationService>();
@@ -56,6 +60,7 @@ namespace Toggl.Foundation.Tests.MvvmCross
                     .WithDialogService(dialogService)
                     .WithBrowserService(browserService)
                     .WithKeyValueStorage(keyValueStorage)
+                    .WithFeedbackService(feedbackService)
                     .WithUserPreferences(userPreferences)
                     .WithOnboardingStorage(onboardingStorage)
                     .WithNavigationService(navigationService)
@@ -114,6 +119,7 @@ namespace Toggl.Foundation.Tests.MvvmCross
             var actualDialogService = Substitute.For<IDialogService>();
             var actualBrowserService = Substitute.For<IBrowserService>();
             var actualKeyValueStorage = Substitute.For<IKeyValueStorage>();
+            var actualFeedbackService = Substitute.For<IFeedbackService>();
             var actualUserPreferences = Substitute.For<IUserPreferences>();
             var actualOnboardingStorage = Substitute.For<IOnboardingStorage>();
             var actualNavigationService = Substitute.For<IMvxNavigationService>();
@@ -125,6 +131,7 @@ namespace Toggl.Foundation.Tests.MvvmCross
                 foundation.StartRegisteringPlatformServices()
                     .WithDialogService(actualDialogService)
                     .WithBrowserService(actualBrowserService)
+                    .WithFeedbackService(actualFeedbackService)
                     .WithKeyValueStorage(actualKeyValueStorage)
                     .WithUserPreferences(actualUserPreferences)
                     .WithOnboardingStorage(actualOnboardingStorage)
@@ -163,6 +170,7 @@ namespace Toggl.Foundation.Tests.MvvmCross
                     .WithLicenseProvider(licenseProvider)
                     .WithAnalyticsService(analyticsService)
                     .WithBackgroundService(backgroundService)
+                    .WithSchedulerProvider(schedulerProvider)
                     .WithPlatformConstants(platformConstants)
                     .WithRemoteConfigService(remoteConfigService)
                     .WithApplicationShortcutCreator(applicationShortcutCreator)

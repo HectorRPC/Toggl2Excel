@@ -7,10 +7,12 @@ using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using Toggl.Foundation.Analytics;
 using Toggl.Foundation.DataSources;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Foundation.MvvmCross.ViewModels.Hints;
 using Toggl.Foundation.Services;
 using Toggl.Multivac;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant;
 using Toggl.PrimeRadiant.Settings;
 
@@ -25,6 +27,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         private readonly IAnalyticsService analyticsService;
         private readonly IOnboardingStorage onboardingStorage;
         private readonly IMvxNavigationService navigationService;
+        private readonly ISchedulerProvider schedulerProvider;
 
         private readonly BehaviorSubject<bool?> impressionSubject = new BehaviorSubject<bool?>(null);
         private readonly ISubject<bool> isFeedbackSuccessViewShowing = new Subject<bool>();
@@ -45,7 +48,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             IRatingService ratingService,
             IAnalyticsService analyticsService,
             IOnboardingStorage onboardingStorage,
-            IMvxNavigationService navigationService)
+            IMvxNavigationService navigationService,
+            ISchedulerProvider schedulerProvider)
         {
             Ensure.Argument.IsNotNull(dataSource, nameof(dataSource));
             Ensure.Argument.IsNotNull(timeService, nameof(timeService));
@@ -53,6 +57,7 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             Ensure.Argument.IsNotNull(analyticsService, nameof(analyticsService));
             Ensure.Argument.IsNotNull(onboardingStorage, nameof(onboardingStorage));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
+            Ensure.Argument.IsNotNull(schedulerProvider, nameof(schedulerProvider));
 
             this.dataSource = dataSource;
             this.timeService = timeService;
@@ -60,13 +65,23 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
             this.analyticsService = analyticsService;
             this.onboardingStorage = onboardingStorage;
             this.navigationService = navigationService;
+            this.schedulerProvider = schedulerProvider;
 
-            Impression = impressionSubject.AsObservable();
-            CtaTitle = Impression.Select(ctaTitle);
-            CtaDescription = Impression.Select(ctaDescription);
-            CtaButtonTitle = Impression.Select(ctaButtonTitle);
+            Impression = impressionSubject.AsDriver(this.schedulerProvider);
 
-            IsFeedbackSuccessViewShowing = isFeedbackSuccessViewShowing.AsObservable();
+            CtaTitle = impressionSubject
+                .Select(ctaTitle)
+                .AsDriver(this.schedulerProvider);
+
+            CtaDescription = impressionSubject
+                .Select(ctaDescription)
+                .AsDriver(this.schedulerProvider);
+
+            CtaButtonTitle = impressionSubject
+                .Select(ctaButtonTitle)
+                .AsDriver(this.schedulerProvider);
+
+            IsFeedbackSuccessViewShowing = isFeedbackSuccessViewShowing.AsDriver(this.schedulerProvider);
         }
 
         public void CloseFeedbackSuccessView()

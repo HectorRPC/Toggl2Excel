@@ -6,6 +6,7 @@ using System.Reactive.Subjects;
 using MvvmCross.Navigation;
 using MvvmCross.ViewModels;
 using Toggl.Foundation.Interactors;
+using Toggl.Foundation.MvvmCross.Extensions;
 using Toggl.Foundation.MvvmCross.Services;
 using Toggl.Multivac;
 using Toggl.Multivac.Extensions;
@@ -35,23 +36,27 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
         public SendFeedbackViewModel(
             IMvxNavigationService navigationService,
             IInteractorFactory interactorFactory,
-            IDialogService dialogService
+            IDialogService dialogService,
+            ISchedulerProvider schedulerProvider
         )
         {
             Ensure.Argument.IsNotNull(interactorFactory, nameof(interactorFactory));
             Ensure.Argument.IsNotNull(navigationService, nameof(navigationService));
             Ensure.Argument.IsNotNull(dialogService, nameof(dialogService));
+            Ensure.Argument.IsNotNull(schedulerProvider, nameof(schedulerProvider));
 
             IsFeedbackEmpty = FeedbackText
                 .Select(text => string.IsNullOrEmpty(text))
                 .DistinctUntilChanged()
-                .StartWith(true);
+                .StartWith(true)
+                .AsDriver(schedulerProvider);
 
             SendEnabled = Observable.CombineLatest(
                 IsFeedbackEmpty,
                 isLoading.AsObservable(),
                 (isEmpty, isLoading) => !isEmpty && !isLoading
-            );
+            )
+            .AsDriver(schedulerProvider);
 
             CloseButtonTapped
                 .WithLatestFrom(IsFeedbackEmpty, (_, isEmpty) => isEmpty)
@@ -104,8 +109,8 @@ namespace Toggl.Foundation.MvvmCross.ViewModels
                 .Subscribe()
                 .DisposedBy(disposeBag);
 
-            ErrorViewVisible = errorViewVisible;
-            IsLoading = isLoading;
+            ErrorViewVisible = errorViewVisible.AsDriver(true, schedulerProvider);
+            IsLoading = isLoading.AsDriver(false, schedulerProvider);
         }
     }
 }

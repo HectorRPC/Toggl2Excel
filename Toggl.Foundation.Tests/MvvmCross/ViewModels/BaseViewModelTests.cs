@@ -26,6 +26,7 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         protected IDialogService DialogService { get; } = Substitute.For<IDialogService>();
         protected IBrowserService BrowserService { get; } = Substitute.For<IBrowserService>();
         protected ILicenseProvider LicenseProvider { get; } = Substitute.For<ILicenseProvider>();
+        protected IFeedbackService FeedbackService { get; } = Substitute.For<IFeedbackService>();
         protected IPlatformConstants PlatformConstants { get; } = Substitute.For<IPlatformConstants>();
         protected IOnboardingStorage OnboardingStorage { get; } = Substitute.For<IOnboardingStorage>();
         protected IRemoteConfigService RemoteConfigService { get; } = Substitute.For<IRemoteConfigService>();
@@ -34,12 +35,13 @@ namespace Toggl.Foundation.Tests.MvvmCross.ViewModels
         protected ISuggestionProviderContainer SuggestionProviderContainer { get; } = Substitute.For<ISuggestionProviderContainer>();
         protected IAutocompleteProvider AutocompleteProvider { get; } = Substitute.For<IAutocompleteProvider>();
 
-        protected TestScheduler TestScheduler { get; } = new TestScheduler();
+        protected TestScheduler TestScheduler { get; }
 
         protected TViewModel ViewModel { get; private set; }
 
         protected BaseViewModelTests()
         {
+            TestScheduler = SchedulerProvider.TestScheduler;
             Setup();
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Concurrency;
 using Android.Content;
+using Android.OS;
 using MvvmCross;
 using MvvmCross.Binding;
 using MvvmCross.Droid.Support.V7.AppCompat;
@@ -21,6 +22,7 @@ using Toggl.Foundation.Services;
 using Toggl.Foundation.Suggestions;
 using Toggl.Giskard.Presenters;
 using Toggl.Giskard.Services;
+using Toggl.Multivac.Extensions;
 using Toggl.PrimeRadiant.Realm;
 using Toggl.PrimeRadiant.Settings;
 using Toggl.Ultrawave;
@@ -79,6 +81,8 @@ namespace Toggl.Giskard
             var platformConstants = new PlatformConstants();
             var keyValueStorage = new SharedPreferencesStorage(sharedPreferences);
             var settingsStorage = new SettingsStorage(appVersion, keyValueStorage);
+            var feedbackService = new FeedbackService(userAgent, mailService, dialogService, platformConstants);
+            var schedulerProvider = new AndroidSchedulerProvider();
 
             var foundation =
                 TogglFoundation
@@ -92,6 +96,7 @@ namespace Toggl.Giskard
                     .WithRatingService<RatingService>()
                     .WithLicenseProvider<LicenseProvider>()
                     .WithAnalyticsService(analyticsService)
+                    .WithSchedulerProvider(schedulerProvider)
                     .WithPlatformConstants(platformConstants)
                     .WithRemoteConfigService<RemoteConfigService>()
                     .WithApiFactory(new ApiFactory(environment, userAgent))
@@ -101,6 +106,7 @@ namespace Toggl.Giskard
 
                     .StartRegisteringPlatformServices()
                     .WithDialogService(dialogService)
+                    .WithFeedbackService(feedbackService)
                     .WithLastTimeUsageStorage(settingsStorage)
                     .WithBrowserService<BrowserService>()
                     .WithKeyValueStorage(keyValueStorage)

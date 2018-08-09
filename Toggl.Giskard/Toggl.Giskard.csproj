@@ -262,6 +262,7 @@
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="LinkerPleaseInclude.cs" />
+    <Compile Include="Startup\AndroidSchedulerProvider.cs" />
     <Compile Include="Startup\QueryableMvxLifecycleMonitorCurrentTopActivity.cs" />
     <Compile Include="Startup\Setup.cs" />
     <Compile Include="Startup\SplashScreen.cs" />
@@ -414,6 +415,7 @@
     <Compile Include="Views\AutocompleteEditText.cs" />
     <Compile Include="Views\NonSwipingViewPager.cs" />
     <Compile Include="Activities\MainActivity.ViewBinds.cs" />
+    <Compile Include="Startup\HandlerScheduler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\AndroidManifest.xml" />

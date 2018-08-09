@@ -138,7 +138,7 @@ namespace Toggl.Daneel.ViewControllers
                 .DisposedBy(disposeBag);
 
             // Refresh Control
-            var refreshControl = new RefreshControl(ViewModel.SyncProgressState.AsDriver(), tableViewSource);
+            var refreshControl = new RefreshControl(ViewModel.SyncProgressState, tableViewSource);
             this.Bind(refreshControl.Refresh, ViewModel.RefreshAction);
             TimeEntriesLogTableView.CustomRefreshControl = refreshControl;
 
@@ -162,8 +162,8 @@ namespace Toggl.Daneel.ViewControllers
                       .To(vm => vm.AlternativeStartTimeEntryCommand);
 
             //Visibility
-            var shouldWelcomeBack = ViewModel.ShouldShowWelcomeBack.AsDriver();
-            this.Bind(ViewModel.ShouldShowEmptyState.AsDriver(), visible => emptyStateView.Hidden = !visible);
+            var shouldWelcomeBack = ViewModel.ShouldShowWelcomeBack;
+            this.Bind(ViewModel.ShouldShowEmptyState, visible => emptyStateView.Hidden = !visible);
             this.Bind(shouldWelcomeBack, WelcomeBackView.BindIsVisible());
             this.Bind(shouldWelcomeBack, spiderContainerView.BindIsVisible());
             this.Bind(shouldWelcomeBack, visible =>
@@ -453,7 +453,7 @@ namespace Toggl.Daneel.ViewControllers
         {
             var storage = ViewModel.OnboardingStorage;
 
-            var timelineIsEmpty = ViewModel.LogEmpty.AsDriver();
+            var timelineIsEmpty = ViewModel.LogEmpty;
 
             new StartTimeEntryOnboardingStep(storage)
                 .ManageDismissableTooltip(StartTimeEntryOnboardingBubbleView, storage)
@@ -476,7 +476,7 @@ namespace Toggl.Daneel.ViewControllers
 
         private void prepareSwipeGesturesOnboarding(IOnboardingStorage storage, IObservable<bool> tapToEditStepIsVisible)
         {
-            var timeEntriesCount = ViewModel.TimeEntriesCount.AsDriver();
+            var timeEntriesCount = ViewModel.TimeEntriesCount;
 
             var swipeRightCanBeShown =
                 UIDevice.CurrentDevice.CheckSystemVersion(11, 0)
